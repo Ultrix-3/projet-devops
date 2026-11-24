@@ -1,0 +1,22 @@
+name: CI/CD Docker Local
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Récupérer le code mis à jour
+        uses: actions/checkout@v4
+
+      - name: Construire la nouvelle image Docker
+        run: docker build -t mon-app:latest .
+
+      - name: Remplacer l'ancien conteneur par le nouveau
+        run: |
+          docker stop app-web || true
+          docker rm app-web || true
+          docker run -d --name app-web -p 80:80 mon-app:latest
